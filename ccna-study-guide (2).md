@@ -626,6 +626,57 @@ When troubleshooting suspected duplex mismatches on Ethernet LANs, look for thes
 
 > 💡 **Exam Focus:** Understand the **different IPv6 address types** (GUA, ULA, Link-Local, Multicast) and their **scope/purpose**. Be able to **identify** these types based on their prefixes. Know the **address compression rules**. Understand the **EUI-64 process** for generating Interface IDs.
 
+**IPv6 Address Type Comparison Table**
+
+| **Feature** | **Global Unicast (GUA)** | **Unique Local (ULA)** | **Link-Local** | **Multicast** | **Anycast** |
+|-------------|--------------------------|------------------------|----------------|---------------|-------------|
+| **Prefix** | 2000::/3 (starts with 2 or 3) | FC00::/7 (FD00::/8 common) | FE80::/10 | FF00::/8 | Uses unicast format |
+| **Scope** | Global (internet-routable) | Organization-wide | Single link only | Defined by scope field | Variable |
+| **IPv4 Analog** | Public IP addresses | Private IP (RFC 1918) | 169.254.0.0/16 (APIPA) | Class D addresses | No direct equivalent |
+| **Primary Purpose** | Internet connectivity | Internal communication | Neighbor discovery, local protocols | One-to-many communication | Service redundancy |
+| **Configuration** | Manual, DHCPv6, SLAAC | Manual, internally generated | Automatic on all interfaces | Predefined or assigned | Manual (same as unicast) |
+| **Structure** | Global Prefix (/48)<br>Subnet ID (16 bits)<br>Interface ID (64 bits) | FD + Global ID (40 bits)<br>Subnet ID (16 bits)<br>Interface ID (64 bits) | FE80::<br>Interface ID (64 bits) | Format: FF[flags][scope]:group-ID | Same as unicast |
+| **Example** | 2001:db8:1234:5678::1/64 | fd12:3456:789a:1::1/64 | fe80::a1b2:c3ff:fe45:6789 | ff02::1 (all nodes) | 2001:db8:85a3::8a2e:370:7334 |
+| **Uniqueness Scope** | Globally unique | Unique within organization | Unique on link | Based on scope field | Not unique (shared) |
+| **Routable Outside Network** | Yes | No | No | Limited by scope | Yes (to nearest) |
+| **Default Gateway** | Can serve as | Can serve as | Cannot serve as | N/A | Can serve as |
+| **Used For** | Internet services, global communication | Internal services, private networks | NDP, routing protocols, DHCPv6 | Service discovery, network protocols | DNS servers, load balancing |
+| **Autoconfiguration** | Yes (SLAAC) | No | Yes (always) | No | No |
+
+**Special Multicast Addresses**
+
+| **Address** | **Scope** | **Purpose** |
+|-------------|-----------|-------------|
+| **FF01::1** | Node-local | All interfaces on node |
+| **FF02::1** | Link-local | All nodes on link |
+| **FF02::2** | Link-local | All routers on link |
+| **FF02::1:2** | Link-local | All DHCP servers/relays |
+| **FF02::1:FFXX:XXXX** | Link-local | Solicited-node multicast (NDP) |
+| **FF05::1:3** | Site-local | All DHCP servers |
+
+**Multicast Scope Field Values**
+
+| **Value** | **Scope** | **Range** |
+|-----------|-----------|-----------|
+| **1** | Node-local | Single node |
+| **2** | Link-local | Single link |
+| **3** | Subnet-local | Single subnet |
+| **4** | Admin-local | Administrator-defined region |
+| **5** | Site-local | Single site |
+| **8** | Organization-local | Organization |
+| **E** | Global | Internet |
+
+**Memory Aid for IPv6 Address Types**
+
+- **G-ULA:** **G**lobal unicast, 2000::/3, **G**oes to the internet (**G**lobally routable)
+- **F-ULA:** **F**ederation unicast (Unique Local), **F**C00::/7, **F**orbidden from internet (organization only)
+- **FELL:** **FE**80 = **L**ink-**L**ocal, never leaves the **L**ink
+- **FIRE:** **F**F = mult**I**cast, **R**outed to **E**veryone in the group
+
+> 💡 **Exam Focus:** Understand the prefixes and scope of each address type. Know that link-local addresses are automatically configured on all IPv6 interfaces and play a critical role in neighbor discovery. Recognize multicast addresses FF02::1 (all nodes) and FF02::2 (all routers). Understand that ULAs serve a similar purpose to RFC 1918 private addresses in IPv4.
+
+
+
 ### **1.10 Client OS IP Parameters**
 
 **Windows**
