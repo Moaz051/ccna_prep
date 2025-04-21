@@ -840,6 +840,16 @@ When troubleshooting suspected duplex mismatches on Ethernet LANs, look for thes
 | **802.11w** | **Management frame protection** | - Secures management frames<br>- Prevents management frame spoofing<br>- Protects against DoS attacks | - Enhanced security<br>- Protection against deauthentication attacks<br>- Network stability |
 | **802.11k** | **Assisted roaming** | - Neighbor AP reports<br>- Optimized AP transition lists<br>- Same wireless band prioritization | - Faster handoffs<br>- Better roaming decisions<br>- Reduces unnecessary probing |
 
+
+
+**Roaming in Wireless Networks**
+
+- **Basic Roaming:** Client-driven process where device searches for better signal when current AP becomes weak
+- **Assisted Roaming (802.11k):** AP provides client with list of neighbor APs for more efficient transitions
+- **Fast Roaming (802.11r):** Accelerates security handshake when moving between APs in same network
+- **Seamless Roaming:** Combination of 802.11k (assisted), 802.11r (fast), and 802.11v (power management)
+
+
 **Memory Aid: "VRKW"**
 
 To remember what each standard does, use the mnemonic **"Very Rapid Knowledgeable Wandering"**:
