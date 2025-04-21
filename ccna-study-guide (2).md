@@ -1412,40 +1412,62 @@ These standards help improve client roaming experience and network management:
 - **WLC Responsibilities (Management):** Authentication, Association/Roaming management, QoS enforcement, Security policies, Radio Resource Management (RRM)
 - **CAPWAP Tunnel:** Control and Data traffic between AP and WLC is encapsulated within a **CAPWAP (Control and Provisioning of Wireless Access Points)** tunnel. Control traffic is DTLS encrypted; data traffic can be optionally encrypted. (UDP Ports 5246 & 5247). *Replaced older LWAPP protocol*
 
-**WLC Interface Details**
 
-- **Service Port Interface:**
-  - Can be configured with static IPv4/IPv6 or dynamic IP via DHCP/SLAAC
-  - **Cannot be assigned a default gateway through DHCP** (this is not true)
-  - Cannot be in the same subnet as the management interface IP
-  - Used specifically for out-of-band maintenance purposes
-  - Physical interface that can be used to recover the WLC if it fails
-  - Accessed using Telnet or SSH
 
-- **Virtual Interface:**
-  - Supports mobility management by providing a consistent IP across multiple controllers
-  - Enables seamless roaming between controllers
-  - Supports embedded Layer 3 security
-  - Used in web authentication (user is redirected to this interface's IP address)
-  - Can function as DHCP server address for wireless clients when DHCP relay is enabled
+| **Interface Type** | **Primary Functions** | **Protocol Support** | **Special Characteristics** | **Common Use Cases** |
+|-------------------|------------------------|---------------------|----------------------------|---------------------|
+| **Management Interface** | • Network management<br>• SNMP polling<br>• Layer 2 LWAPP communications | • SNMP<br>• HTTP/HTTPS<br>• Telnet/SSH | • Must be assigned to an active port<br>• Required for operation | • Continuous monitoring<br>• Controller administration<br>• Network management system integration |
+| **AP-Manager Interface** | • CAPWAP control channel<br>• Layer 3 communications | • LWAPP/CAPWAP<br>• Layer 3 control | • Contains source IP for AP communication<br>• Must be unique on network | • AP discovery and join process<br>• AP control and configuration |
+| **Service Port Interface** | • Out-of-band management<br>• Controller recovery | • Telnet/SSH<br>• TFTP | • Physical interface<br>• Only available during boot | • Maintenance operations<br>• WLC recovery<br>• Initial setup |
+| **Virtual Interface** | • Mobility management<br>• Web authentication<br>• DHCP relay | • HTTP/HTTPS<br>• Layer 3 security protocols | • Not mapped to physical port<br>• Used across controller cluster | • Client roaming<br>• Guest access<br>• Authentication redirection |
+| **Dynamic Interface** | • Client data traffic<br>• VLAN segmentation | • User data protocols | • Up to 512 interfaces<br>• User-defined | • Traffic segmentation<br>• SSID-to-VLAN mapping<br>• Network isolation |
 
-- **AP-Manager Interface:**
-  - Contains the source IP address used by lightweight access points (APs) to communicate with the WLC
-  - Communicates with the lightweight APs on the wireless network
-  - IP address must be unique on the network
-  - After configuration, the WLC uses this interface to listen for Layer 3 Lightweight Access Point Protocol (LWAPP) communications
+**Management Interface Detailed Functions**
 
-- **Management Interface:**
-  - Used for in-band management information
-  - Handles all Layer 2 LWAPP communications between the controller and lightweight APs
-  - Used to communicate with other WLCs on the wireless network
+- Acts as the primary interface for controller administration and monitoring
+- **Used for continuous SNMP polling** by network management systems
+- Provides in-band management access for configuration and monitoring
+- Used for Layer 2 communications between controller and APs
+- Serves as communication path between multiple WLCs in a network
+- Handles inter-controller roaming and mobility
 
-- **Dynamic Interfaces:**
-  - WLC can support up to 512 dynamic interfaces
-  - User-defined interfaces typically used for wireless client data
-  - Function similarly to virtual local area networks (VLANs)
-  - Can be created to segment traffic on the WLC
+**AP-Manager Interface Detailed Functions**
 
+- Manages all Layer 3 communications with lightweight APs
+- Contains the IP address used as the source for APs to communicate with the WLC
+- Must have a unique IP address on the network
+- After configuration, listens for LWAPP/CAPWAP traffic from APs
+- Controls AP discovery, join, and configuration processes
+- Multiple AP-manager interfaces can be used for load balancing
+
+**Service Port Interface Detailed Functions**
+
+- Used specifically for out-of-band maintenance and recovery operations
+- Physical interface on the WLC that can be used to recover a failed controller
+- Only interface available during WLC boot process
+- Can be accessed using Telnet or SSH during maintenance
+- Cannot be in the same subnet as the management interface
+- Doesn't support routing; no default gateway configuration
+
+**Virtual Interface Detailed Functions**
+
+- Provides mobility management with consistent IP across multiple controllers
+- Used for client redirection during web authentication
+- Supports embedded Layer 3 security processes
+- Serves as DHCP relay address for wireless clients when enabled
+- Enables seamless roaming between controllers in a mobility group
+- Used for Layer 3 security operations
+
+**Dynamic Interface Detailed Functions**
+
+- User-defined interfaces for wireless client data traffic
+- Function similarly to VLANs for traffic segmentation
+- Up to 512 dynamic interfaces supported on enterprise WLCs
+- Used to map SSIDs to specific VLANs
+- Enable network segmentation and isolation
+- Can be configured similarly to virtual LANs (VLANs)
+
+> 💡 **Exam Focus:** Understand that the **Management Interface** is typically used for **continuous SNMP polling**. Know the distinct purposes of each interface type, particularly how the **Management Interface** handles in-band management, the **AP-Manager Interface** manages Layer 3 communications with APs, the **Service Port Interface** provides out-of-band maintenance, the **Virtual Interface** enables mobility, and **Dynamic Interfaces** segment client traffic.
 **AP Discovery & Join Process**
 
 1. AP boots up, needs an IP address (usually via DHCP)
