@@ -388,6 +388,72 @@ Content-Length: 1234
 
 > 💡 **Exam Focus:** Differentiate **SMF vs. MMF** (distance, core size, cost, light source). Know common **UTP categories (Cat5e, Cat6, Cat6a)** and their speed/distance capabilities. Understand **Shared vs. Point-to-Point** media and **Half vs. Full Duplex**. Recognize common fiber standards (SX, LX, SR, LR).
 
+**Digital WAN Circuit Standards Comparison**
+
+| **Feature** | **T1** | **E1** | **T3** | **E3** |
+|-------------|--------|--------|--------|--------|
+| **Bandwidth** | 1.544 Mbps | 2.048 Mbps | 44.736 Mbps | 34.368 Mbps |
+| **Channel Structure** | 24 DS0 channels + framing bit | 32 eight-bit timeslots | 672 DS0 channels | 16 E1 lines |
+| **Frame Size** | 193 bits | 256 bits (32 × 8) | Multiple T1s (28) | Multiple E1s (16) |
+| **Frame Rate** | 8,000 frames/second | 8,000 frames/second | 8,000 frames/second | 8,000 frames/second |
+| **Calculation** | 193 × 8,000 = 1.544 Mbps | 256 × 8,000 = 2.048 Mbps | 5,592 × 8,000 = 44.736 Mbps | 4,296 × 8,000 = 34.368 Mbps |
+| **Media** | 2 pairs shielded copper | 2 pairs shielded copper | Coaxial or fiber | Coaxial or fiber |
+| **Primary Region** | North America, Japan | Europe, Australia, South America | North America, Japan | Europe, Australia, South America |
+| **Common Application** | SMB internet, voice | SMB internet, voice | ISP backbones, large enterprises | ISP backbones, large enterprises |
+
+**T-Carrier System (North American Standard)**
+
+- **T1:**
+  - **Bandwidth:** 1.544 Mbps
+  - **Structure:** Uses DS1 (Digital Signal 1) signaling frames
+  - **Composition:** 24 DS0 channels (64 Kbps each) plus 1 framing bit
+  - **Channel Size:** Each DS0 transfers 8 bits at a time
+  - **Frame Rate:** 8,000 DS1 frames per second
+  - **Calculation:** 24 channels × 8 bits + 1 framing bit = 193 bits × 8,000 frames/sec = 1.544 Mbps
+  - **Physical:** Two pairs of shielded copper wires (one for transmit, one for receive)
+
+- **T3:**
+  - **Bandwidth:** 44.736 Mbps
+  - **Structure:** Equivalent to 28 T1 circuits
+  - **Composition:** 672 DS0 channels
+  - **Usage:** Typically cost-prohibitive except for ISPs and large enterprises
+  - **Media:** Typically delivered over coaxial cable or fiber
+
+**E-Carrier System (European Standard)**
+
+- **E1:**
+  - **Bandwidth:** 2.048 Mbps
+  - **Structure:** 32 eight-bit timeslots
+  - **Differences from T1:**
+    - More bandwidth (2.048 vs 1.544 Mbps)
+    - More channels (32 vs 24)
+    - Used primarily in Europe vs North America
+  - **Frame Rate:** 8,000 timeslot groups per second
+  - **Calculation:** 32 timeslots × 8 bits × 8,000 frames/sec = 2.048 Mbps
+
+- **E3:**
+  - **Bandwidth:** 34.368 Mbps
+  - **Structure:** Equivalent to 16 E1 circuits
+  - **Usage:** Typically used by service providers for backbone connections
+  - **Regional Deployment:** European standard
+
+**Fractional Services**
+
+- **Fractional T1/E1:** Allows organizations to purchase only the channels they need
+- **Typical Increments:** T1 (in 64 Kbps DS0 increments), E1 (in 64 Kbps timeslot increments)
+- **Cost Efficiency:** Pay only for required bandwidth while using same physical infrastructure
+
+**Channel Service Unit/Data Service Unit (CSU/DSU)**
+
+- Required equipment to connect router/network to T1/E1 service
+- Handles encoding, electrical termination, and clocking
+- Modern routers often have integrated CSU/DSU in WAN interface cards
+
+> 💡 **Exam Focus:** Remember the exact bandwidth values of common WAN circuits: T1 (1.544 Mbps), E1 (2.048 Mbps), T3 (44.736 Mbps), and E3 (34.368 Mbps). Know that T-carrier is used primarily in North America and Japan, while E-carrier is used in Europe. Understand how the bandwidth is calculated based on channel structure and frame rate.
+
+
+
+
 ### **1.7 Interface and Cable Issues**
 
 **Common Layer 1 (Physical) Issues**
@@ -1315,6 +1381,87 @@ Since VLANs are separate broadcast domains, a Layer 3 device (router or Layer 3 
 - **Root Guard:** Prevents a port from becoming a Root Port. Enforces Root Bridge location. Puts port in root-inconsistent state if superior BPDUs arrive
 - **Loop Guard:** Prevents Alternate/Root ports from wrongly becoming Designated if BPDUs stop arriving (e.g., unidirectional link failure). Puts port in loop-inconsistent state
 - **BPDU Filter:** Stops sending/receiving BPDUs. **Use with extreme caution!** Effectively disables STP on the port
+
+**STP Protection Features Detailed Comparison**
+
+| **Feature** | **Purpose** | **When to Use** | **Reaction When Triggered** | **Configuration Command** | **Recovery Method** |
+|-------------|-------------|----------------|----------------------------|--------------------------|---------------------|
+| **PortFast** | Bypasses STP waiting states | Access ports connecting to end devices only | N/A (not a protection mechanism) | `spanning-tree portfast` | N/A |
+| **BPDU Guard** | Prevents rogue switch connections | PortFast-enabled access ports | **Err-disables** the port | `spanning-tree bpduguard enable` | Manual or auto recovery |
+| **Root Guard** | Maintains root bridge placement | Ports that should not become root ports | Puts port in **root-inconsistent** state | `spanning-tree guard root` | Automatic when BPDU stops |
+| **Loop Guard** | Prevents loops from unidirectional links | Non-designated ports (potential alternate/backup ports) | Puts port in **loop-inconsistent** state | `spanning-tree guard loop` | Automatic when BPDU received |
+| **BPDU Filter** | Stops BPDU transmission/reception | Rarely used - extreme caution required | Effectively disables STP on the port | `spanning-tree bpdufilter enable` | N/A |
+
+**PortFast Feature**
+
+- **Purpose:** Immediately transitions port to forwarding state (skips listening/learning)
+- **Normal STP Behavior:** Port takes 30+ seconds to start forwarding
+- **PortFast Benefit:** Immediate network access for end devices
+- **Critical Warning:** **ONLY** use on ports connected to single end devices (never switch-to-switch)
+- **Risk:** Can cause temporary loops if connected to another switch
+- **Global Configuration:** `spanning-tree portfast default` (applies to all access ports)
+- **Interface Configuration:** `spanning-tree portfast` (specific port)
+
+**BPDU Guard**
+
+- **Purpose:** Enforces edge of STP domain, prevents unauthorized switch connections
+- **Operation:** Immediately err-disables port if any BPDU is received
+- **Best Practice:** Enable on **all PortFast-enabled ports**
+- **Why It's Needed:** PortFast alone transitions to forwarding but still accepts BPDUs; BPDU Guard provides security
+- **Global Configuration:** `spanning-tree portfast bpduguard default`
+- **Interface Configuration:** `spanning-tree bpduguard enable`
+- **Recovery:** 
+  - Manual: `shutdown` followed by `no shutdown`
+  - Automatic: Configure `errdisable recovery cause bpduguard` and `errdisable recovery interval <seconds>`
+
+**Root Guard**
+
+- **Purpose:** Prevents external switches from becoming root bridge
+- **Operation:** Blocks BPDUs that would make the port a root port
+- **Use Case:** Ports connecting to customer or other administrative domains
+- **State When Triggered:** Root-inconsistent (blocks BPDUs but allows data traffic)
+- **Recovery:** Automatic when superior BPDUs stop arriving
+- **Configuration:** `spanning-tree guard root`
+
+**Loop Guard**
+
+- **Purpose:** Prevents loops caused by unidirectional link failures
+- **Operation:** If BPDUs stop arriving on a non-designated port, prevents transition to designated/forwarding
+- **Best Placement:** Non-designated ports (alternate/backup/root)
+- **State When Triggered:** Loop-inconsistent
+- **Recovery:** Automatic when BPDUs resume
+- **Global Configuration:** `spanning-tree loopguard default`
+- **Interface Configuration:** `spanning-tree guard loop`
+
+**Common Issues and Troubleshooting**
+
+- **Err-disabled Port Due to BPDU Guard:**
+  - **Symptom:** Port in err-disabled state
+  - **Verify:** `show spanning-tree summary` and `show interfaces status err-disabled`
+  - **Cause:** PortFast + BPDU Guard enabled, and another switch connected
+  - **Fix:** Remove the unauthorized switch, then recover the port
+
+- **PortFast and BPDU Guard Interaction:**
+  - PortFast transitions port to forwarding immediately
+  - If another switch is connected to PortFast port with BPDU Guard:
+    1. Port enters forwarding state (PortFast)
+    2. Switch receives BPDU from connected switch
+    3. BPDU Guard triggers, port goes err-disabled
+    4. Connection is effectively shut down, preventing loops
+
+**Best Practices**
+
+- **PortFast:** Enable on all access ports connecting to end devices
+- **BPDU Guard:** Enable on all PortFast-enabled ports
+- **Root Guard:** Enable on ports where root bridge role should not change
+- **Loop Guard:** Enable on non-designated ports
+- **Comprehensive Protection:** Use `spanning-tree portfast bpduguard default` globally
+
+> 💡 **Exam Focus:** Understand that **PortFast alone doesn't prevent loops** - it simply accelerates transition to forwarding. **BPDU Guard** is what actually protects by err-disabling the port. Know which feature to use for specific scenarios and what happens when triggered. Remember that PortFast should **NEVER** be enabled on switch-to-switch links.
+
+
+
+
 
 **STP Variants**
 
